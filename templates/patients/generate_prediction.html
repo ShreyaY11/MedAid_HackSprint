@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Prediction - MedAid{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 800px; margin: 2rem auto;">
+        <div class="card">
+            <div class="card-body p-4">
+                <h2 class="mb-4">
+                    <i class="bi bi-robot"></i> Generate AI Prediction
+                </h2>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Patient:</strong> {{ patient.get_full_name }} ({{ patient.age }} years)
+                </div>
+
+                <h5 class="mb-3">Symptoms to Analyze:</h5>
+
+                <div class="row">
+                    {% for symptom in symptoms %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ symptom.symptom_name }}</h6>
+                                <p class="card-text mb-0">
+                                    <span class="badge bg-warning text-dark">{{ symptom.get_severity_display }}</span>
+                                    <span class="badge bg-secondary">{{ symptom.duration_days }} days</span>
+                                </p>
+                                {% if symptom.notes %}
+                                <small class="text-muted">{{ symptom.notes }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="alert alert-warning mt-4">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Note:</strong> AI predictions are for reference only. Always consult a qualified healthcare professional.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-robot"></i> Generate AI Disease Prediction
+                        </button>
+                        <a href="{% url 'add_symptoms' patient.id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Symptoms
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

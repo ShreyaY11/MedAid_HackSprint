@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction Results - MedAid{% endblock %}
+
+{% block extra_css %}
+<style>
+    .prediction-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+    
+    .risk-badge-low { background: linear-gradient(135deg, #10b981, #059669); }
+    .risk-badge-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .risk-badge-high { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .risk-badge-critical { background: linear-gradient(135deg, #dc2626, #991b1b); }
+    
+    .info-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .confidence-bar {
+        height: 30px;
+        background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%);
+        border-radius: 15px;
+        position: relative;
+    }
+    
+    .confidence-marker {
+        position: absolute;
+        top: -5px;
+        width: 3px;
+        height: 40px;
+        background: #1f2937;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 900px; margin: 2rem auto;">
+        
+        <div class="prediction-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-2">
+                        <i class="bi bi-clipboard-pulse"></i> Disease Prediction Results
+                    </h2>
+                    <p class="mb-0">Patient: {{ prediction.patient.get_full_name }}</p>
+                    <small>Generated on {{ prediction.prediction_date|date:"F d, Y at h:i A" }}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge risk-badge-{{ prediction.risk_level }} p-3" style="font-size: 1.2rem;">
+                        {{ prediction.get_risk_level_display|upper }} RISK
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h4 class="mb-3">
+                <i class="bi bi-bullseye"></i> Primary Diagnosis
+            </h4>
+            <h2 class="text-primary">{{ prediction.predicted_disease }}</h2>
+            
+            <div class="mt-3">
+                <label class="form-label"><strong>Confidence Score:</strong> {{ prediction.confidence_score }}%</label>
+                <div class="confidence-bar">
+                    <div class="confidence-marker" style="left: {{ prediction.confidence_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section">
+                    <h5><i class="bi bi-prescription2"></i> Recommended Tests</h5>
+                    <ul class="list-unstyled">
+                        {% for test in prediction.further_diagnostics.splitlines %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i> {{ test }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="info-section">
+                    <h5><i class="bi bi-heart-pulse"></i> Lifestyle Recommendations</h5>
+                    <ul class="list-unstyled">
+                        {% for rec in prediction.recommendations.splitlines %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-info"></i> {{ rec }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        {% if prediction.specialist_referral %}
+        <div class="info-section">
+            <h5><i class="bi bi-hospital"></i> Specialist Referral</h5>
+            <p class="mb-0">
+                <span class="badge bg-primary p-2">{{ prediction.specialist_referral }}</span>
+            </p>
+        </div>
+        {% endif %}
+        
+        <div class="info-section">
+            <h5><i class="bi bi-list-ul"></i> Symptoms Analyzed</h5>
+            <div class="row">
+                {% for symptom in prediction.symptoms_analyzed %}
+                <div class="col-md-6 mb-2">
+                    <div class="alert alert-light border mb-0">
+                        <strong>{{ symptom.name }}</strong><br>
+                        <small>{{ symptom.severity }} - {{ symptom.duration }} days</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <strong>Medical Disclaimer:</strong> This is an AI-generated prediction and should not replace professional medical advice. Please consult with a qualified healthcare provider for proper diagnosis and treatment.
+        </div>
+        
+        <div class="d-grid gap-2">
+            {% if user.user_type == 'admin' %}
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'patient_dashboard' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

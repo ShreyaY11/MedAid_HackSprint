@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Symptoms - MedAid{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <h3 class="mb-4">
+                        <i class="bi bi-clipboard-plus"></i> Add Symptoms for {{ patient.get_full_name }}
+                    </h3>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Record all symptoms experienced by the patient
+                    </div>
+
+                    <form method="post" id="symptomForm">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Symptom Name *</label>
+                            {{ form.symptom_name }}
+                            <small class="text-muted">e.g., Fever, Cough, Headache</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Severity *</label>
+                                {{ form.severity }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Duration (days) *</label>
+                                {{ form.duration_days }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="add_more" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Add Symptom & Continue
+                            </button>
+
+                            {% if existing_symptoms %}
+                            <button type="submit" name="action" value="generate_prediction" class="btn btn-success btn-lg">
+                                <i class="bi bi-robot"></i> Generate AI Prediction
+                            </button>
+                            {% endif %}
+
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-3">
+                        <i class="bi bi-list-check"></i> Recorded Symptoms ({{ existing_symptoms.count }})
+                    </h5>
+                    <hr>
+
+                    {% for symptom in existing_symptoms %}
+                    <div class="alert alert-light border d-flex justify-content-between align-items-start mb-2">
+                        <div class="flex-grow-1">
+                            <strong>{{ symptom.symptom_name }}</strong><br>
+                            <small class="text-muted">
+                                <span class="badge bg-warning text-dark">{{ symptom.get_severity_display }}</span>
+                                {{ symptom.duration_days }} days
+                            </small>
+                            {% if symptom.notes %}
+                            <br><small>{{ symptom.notes }}</small>
+                            {% endif %}
+                        </div>
+                        <form method="post" action="{% url 'delete_symptom' symptom.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger ms-2" 
+                                    onclick="return confirm('Delete this symptom?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-3">
+                        <i class="bi bi-inbox" style="font-size: 2rem;"></i><br>
+                        No symptoms recorded yet
+                    </p>
+                    {% endfor %}
+
+                    {% if existing_symptoms %}
+                    <div class="alert alert-success mt-3">
+                        <i class="bi bi-check-circle"></i> 
+                        Ready to generate prediction
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

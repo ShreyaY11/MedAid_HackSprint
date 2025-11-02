@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Registration - MedAid{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 600px; margin: 2rem auto;">
+        <div style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="bi bi-hospital" style="font-size: 4rem; color: #4f46e5;"></i>
+                <h2 style="font-weight: 700; margin-top: 1rem;">Admin Registration</h2>
+                <p class="text-muted">Create your healthcare provider account</p>
+            </div>
+
+            <form method="post" action="{% url 'admin_register' %}">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    {{ form.username }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone Number</label>
+                        {{ form.phone_number }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Age</label>
+                        {{ form.age }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    {{ form.password1 }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    {{ form.password2 }}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
+                    <i class="bi bi-person-plus"></i> Register as Admin
+                </button>
+
+                <div class="text-center">
+                    <p class="mb-0">Already have an account? 
+                        <a href="{% url 'login' %}">Login here</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
